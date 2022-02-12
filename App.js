@@ -1,12 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
 import Header from './components/Header';
+import StartGame from './screens/StartGame';
 
 export default function App() {
   return (
     <View style={styles.root}>
       <Header title={'guessApp'}></Header>
+      <StartGame />
     </View>
   );
 }
