@@ -1,7 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  Alert,
+  ScrollView,
+  FlatList,
+} from 'react-native';
 import NumberOutput from '../components/NumberOutput';
 import Card from '../components/Card';
+import TitleText from '../components/TitleText';
+import BasicButton from '../components/BasicButton';
+import { Ionicons } from '@expo/vector-icons';
+import BodyText from '../components/BodyText';
 
 const randomNumber = (min, max, exclude) => {
   const minVal = Math.ceil(min);
@@ -15,16 +27,35 @@ const randomNumber = (min, max, exclude) => {
 };
 
 const Game = (props) => {
-  const [guess, setGuess] = useState(randomNumber(1, 100, props.userNumber));
+  const initialGuess = randomNumber(1, 100, props.userNumber);
+  const [guess, setGuess] = useState(initialGuess);
   const startRange = useRef(1);
-  const endRange = useRef(99);
-  const [roundsAmount, setRoundsAmount] = useState(0);
+  const endRange = useRef(100);
+  const [guessList, setGuessList] = useState([initialGuess]);
 
   const { userNumber, onEnd } = props;
 
+  // const renderListItem = (value, numOfRound) => {
+  //   return (
+  //     <View key={value} style={styles.listItem}>
+  //       <BodyText>#{numOfRound}</BodyText>
+  //       <BodyText>{value}</BodyText>
+  //     </View>
+  //   );
+  // };
+
+  const renderListItem = (listLength, dataItem) => {
+    return (
+      <View key={dataItem.item} style={styles.listItem}>
+        <BodyText>#{listLength - dataItem.index}</BodyText>
+        <BodyText>{dataItem.item}</BodyText>
+      </View>
+    );
+  };
+
   useEffect(() => {
     if (guess === userNumber) {
-      onEnd(roundsAmount);
+      onEnd(guessList.length);
     }
   }, [guess, userNumber, onEnd]);
 
@@ -42,27 +73,44 @@ const Game = (props) => {
     if (tip === 'lower') {
       endRange.current = guess;
     } else {
-      startRange.current = guess;
+      startRange.current = guess + 1;
     }
 
-    setGuess(randomNumber(startRange.current, endRange.current, guess));
-    setRoundsAmount((currVal) => ++currVal);
+    const currentGuess = randomNumber(
+      startRange.current,
+      endRange.current,
+      guess
+    );
+
+    setGuess(currentGuess);
+    setGuessList((prevList) => [currentGuess, ...prevList]);
   };
 
   return (
     <View style={styles.gameContainer}>
-      <Text style={{ fontSize: 16 }}>Oponent's guess</Text>
+      <TitleText>Oponent's guess</TitleText>
       <NumberOutput value={guess}></NumberOutput>
       <Card style={styles.buttonsContainer}>
-        <Button
-          title='lower'
-          onPress={handleGivenTip.bind(this, 'lower')}
-        ></Button>
-        <Button
-          title='greater'
-          onPress={handleGivenTip.bind(this, 'greater')}
-        ></Button>
+        <BasicButton onPress={handleGivenTip.bind(this, 'lower')}>
+          <Ionicons name='md-remove' color={'white'} size={26} />
+        </BasicButton>
+        <BasicButton onPress={handleGivenTip.bind(this, 'greater')}>
+          <Ionicons name='md-add' color={'white'} size={26} />
+        </BasicButton>
       </Card>
+      <View style={styles.list}>
+        {/* <ScrollView contentContainerStyle={styles.scrollList}>
+          {guessList.map((item, index) =>
+            renderListItem(item, guessList.length - index)
+          )}
+        </ScrollView> */}
+        <FlatList
+          keyExtractor={(item) => item.toString()}
+          data={guessList}
+          contentContainerStyle={styles.scrollList}
+          renderItem={renderListItem.bind(this, guessList.length)}
+        ></FlatList>
+      </View>
     </View>
   );
 };
@@ -71,6 +119,7 @@ const styles = StyleSheet.create({
   gameContainer: {
     alignItems: 'center',
     paddingTop: 10,
+    flex: 1,
   },
 
   buttonsContainer: {
@@ -79,6 +128,27 @@ const styles = StyleSheet.create({
     width: 300,
     justifyContent: 'space-around',
     padding: 20,
+  },
+
+  list: {
+    flex: 1,
+    width: '60%',
+  },
+
+  scrollList: {
+    justifyContent: 'flex-end',
+    flexGrow: 1,
+  },
+
+  listItem: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    padding: 15,
+    marginVertical: 10,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
 });
 

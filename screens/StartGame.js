@@ -13,6 +13,8 @@ import Card from '../components/Card';
 import colors from '../constants/colors';
 import Input from '../components/Input';
 import NumberOutput from '../components/NumberOutput';
+import TitleText from '../components/TitleText';
+import BasicButton from '../components/BasicButton';
 
 const StartGame = (props) => {
   const [enteredValue, setEnteredValue] = useState('');
@@ -49,17 +51,16 @@ const StartGame = (props) => {
       <Card style={styles.feedbackContainer}>
         <Text>You selected</Text>
         <NumberOutput value={confirmedValue} />
-        <Button
-          title='Start game'
-          onPress={() => props.onStart(confirmedValue)}
-        />
+        <BasicButton onPress={() => props.onStart(confirmedValue)}>
+          Start game
+        </BasicButton>
       </Card>
     );
   }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.screen}>
-        <Text style={styles.title}>Start the game</Text>
+        <TitleText style={styles.title}>Start the game</TitleText>
         <Card style={styles.cardContainer}>
           <Text>Select a number</Text>
           <Input
@@ -101,8 +102,9 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 24,
-    marginVertical: 15,
+    // fontSize: 24,
+    marginVertical: 40,
+    // fontFamily: 'roboto-bold',
   },
 
   cardContainer: {
